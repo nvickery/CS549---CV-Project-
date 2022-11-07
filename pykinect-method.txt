@@ -1,0 +1,10 @@
+How to get pykinect2 to work with OpenCV:
+
+1. pip install opencv (or whatever its called) 
+
+2. Download SDK from microsoft and verify it works with Kinect V2
+
+3. pip install comtypes==1.1.4
+
+4. Go to "C:\Users\Nathanael\AppData\Local\Programs\Python\Python37\Lib\site-packages\pykinect2" and replace "PyKinectV2.py" with the equivalent fiel from Github. 
+
