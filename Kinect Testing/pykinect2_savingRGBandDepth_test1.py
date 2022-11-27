@@ -13,13 +13,15 @@ from pykinect2 import PyKinectRuntime
 import cv2
 import numpy as np
 
+kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Color)
+
 # Define the codec and create VideoWriter object
-fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-rgb_vid = cv2.VideoWriter('rgb_output.avi', fourcc, 30.0, (1920,  1080))
+fourcc = cv2.VideoWriter_fourcc('X','V','I','D')
+color_H,color_W = kinect.color_frame_desc.Height, kinect.color_frame_desc.Width
+rgb_vid = cv2.VideoWriter('rgb_output.mp4', fourcc, 30.0, (color_W,color_H))
+print(color_H,color_W)
 #depth_vid = cv.VideoWriter('depth_output.avi', fourcc, 30.0, (512,  424))
 # Adjust parameters above for kinect video feed (look it up)
-
-kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Color)
 
 while True:
     if kinect.has_new_depth_frame():
@@ -27,11 +29,14 @@ while True:
         color_frame = kinect.get_last_color_frame()
         colorImage = color_frame.reshape((kinect.color_frame_desc.Height, kinect.color_frame_desc.Width, 4)).astype(np.uint8)
         colorImage = cv2.flip(colorImage, 1)
+        #print(colorImage.shape)
+        img_BGR = cv2.cvtColor(colorImage,cv2.COLOR_RGB2BGR)
+        rgb_vid.write(img_BGR)
+        #rgb_vid.write(colorImage)
         cv2.imshow('Test Color View', cv2.resize(colorImage, (int(1920 / 2.5), int(1080 / 2.5))))
-        rgb_vid.write(colorImage)
         # Depth Image
 ##        depth_frame = kinect.get_last_depth_frame()
-##        depth_img = depth_frame.reshape((kinect.depth_frame_desc.Height, kinect.depth_frame_desc.Width)).astype(np.uint8)
+##        depth_img = depth_frame.reshape((kinect.depth_frame_desc.Height, kinect.depth_frame_desc.Width)).astype(np.uint16)
 ##        depth_img = cv2.flip(depth_img, 1)
 ##        cv2.imshow('Test Depth View', depth_img)
 ##        depth_vid.write(depth_img)

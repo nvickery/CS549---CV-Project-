@@ -18,15 +18,16 @@ kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyK
 while True:
     if kinect.has_new_depth_frame():
         # RGB Image
-##        color_frame = kinect.get_last_color_frame()
-##        colorImage = color_frame.reshape((kinect.color_frame_desc.Height, kinect.color_frame_desc.Width, 4)).astype(np.uint8)
-##        colorImage = cv2.flip(colorImage, 1)
-##        cv2.imshow('Test Color View', cv2.resize(colorImage, (int(1920 / 2.5), int(1080 / 2.5))))
+        color_frame = kinect.get_last_color_frame()
+        colorImage = color_frame.reshape((kinect.color_frame_desc.Height, kinect.color_frame_desc.Width, 4)).astype(np.uint8)
+        colorImage = cv2.flip(colorImage, 1)
+        cv2.imshow('Test Color View', cv2.resize(colorImage, (int(1920 / 2.5), int(1080 / 2.5))))
         # Depth Image
         depth_frame = kinect.get_last_depth_frame()
-        depth_img = depth_frame.reshape((kinect.depth_frame_desc.Height, kinect.depth_frame_desc.Width)).astype(np.uint8)
+        depth_img = depth_frame.reshape((kinect.depth_frame_desc.Height, kinect.depth_frame_desc.Width)).astype(np.uint16)
         depth_img = cv2.flip(depth_img, 1)
-        cv2.imshow('Test Depth View', depth_img)
+        print(depth_img[50][50])
+        #cv2.imshow('Test Depth View', depth_img)
         # print(color_point_2_depth_point(kinect, _DepthSpacePoint, kinect._depth_frame_data, [100, 100]))
         # print(depth_points_2_world_points(kinect, _DepthSpacePoint, [[100, 150], [200, 250]]))
         # print(intrinsics(kinect).FocalLengthX, intrinsics(kinect).FocalLengthY, intrinsics(kinect).PrincipalPointX, intrinsics(kinect).PrincipalPointY)
