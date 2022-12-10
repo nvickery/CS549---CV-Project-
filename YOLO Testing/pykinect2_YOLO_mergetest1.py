@@ -16,25 +16,24 @@ import numpy as np
 import time
 import os
 
-## Intiate YOLO Model ---------------------------------------------------------
-path = r"C:\Users\Nathanael\Documents\GitHub\CS549---CV-Project-\YOLO Testing"
+# Intiate YOLO Model ---------------------------------------------------------
+
+# Change to Path location of weights and cfg files
+path = r"C:\Users\layhu\OneDrive\Grad School\CS 549  (Computer Vision)\CS549---CV-Project-\YOLO Testing"
 if os.getcwd() is not path:
     os.chdir(path)
     
 # Load Yolo
-#net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
-net = cv2.dnn.readNet("yolov3-tiny.weights", "yolov3-tiny.cfg")
+net = cv2.dnn.readNet("weights/yolov3.weights", "cfg/yolov3.cfg")
+# net = cv2.dnn.readNet("weights/yolov3-tiny.weights", "cfg/yolov3-tiny.cfg")
 classes = []
 with open("coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 layer_names = net.getLayerNames()
-output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
-#output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
-cap = cv2.VideoCapture(0)
 
-# Intial Image
 font = cv2.FONT_HERSHEY_PLAIN
 starting_time = time.time()
 frame_id = 0
@@ -46,22 +45,31 @@ prevBoxes = []
 kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Color) #PyKinectV2.FrameSourceTypes_Depth | 
 
 
-## Main Loop -----------------------------------------------------------------
+# Main loop ------------------------------------------------------------------
 while True:
-    if kinect.has_new_depth_frame():
+    if kinect.has_new_color_frame():
         # RGB Image
         color_frame = kinect.get_last_color_frame()
-        colorImage = color_frame.reshape((kinect.color_frame_desc.Height, kinect.color_frame_desc.Width, 4)).astype(np.uint8)
+        height = kinect.color_frame_desc.Height
+        width = kinect.color_frame_desc.Width
+
+
+        # pre process image 
+        colorImage = color_frame.reshape((height,width, 4)).astype(np.uint8)
+        trimmed_image = colorImage[:,:,0:3] # removes 255 values that are leftover from the reshaping from 4th column 
         colorImage = cv2.flip(colorImage, 1)
-        #cv2.imshow('Test Color View', cv2.resize(colorImage, (int(1920 / 2.5), int(1080 / 2.5))))
-    
-   # _, color_frame = cap.read()
+
+        # cv2.imshow('Test Color View', cv2.resize(trimmed_image, (int(1920 / 2.5), int(1080 / 2.5))))
+        
+        
+        
         frame_id += 1
-        height, width, channels = color_frame.shape
+
+        # height, width, channels = color_frame.shape
+        channels = trimmed_image.shape[2]  # 3 Channels (RGB)
 
         # Detecting objects
-        blob = cv2.dnn.blobFromImage(color_frame, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
-
+        blob = cv2.dnn.blobFromImage(trimmed_image, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
         net.setInput(blob)
         outs = net.forward(output_layers)
 
@@ -98,32 +106,19 @@ while True:
                 label = str(classes[class_ids[i]])
                 confidence = confidences[i]
                 color = colors[class_ids[i]]
-                cv2.rectangle(color_frame, (x, y), (x + w, y + h), color, 2)
-                cv2.putText(color_frame, label + " " + str(round(confidence, 2)), (x, y + 30), font, 2, color, 2)
+                cv2.rectangle(colorImage, (x, y), (x + w, y + h), color, 2)
+                cv2.putText(colorImage, label + " " + str(round(confidence, 2)), (x, y + 30), font, 2, color, 2)
 
         elapsed_time = time.time() - starting_time
         fps = frame_id / elapsed_time
-        cv2.putText(color_frame, "FPS: " + str(round(fps, 2)), (10, 50), font, 2, (0, 0, 0), 3)
-        cv2.imshow("Image", color_frame)    
-    
-##        # Depth Image
-##        depth_frame = kinect.get_last_depth_frame()
-##        depth_img = depth_frame.reshape((kinect.depth_frame_desc.Height, kinect.depth_frame_desc.Width)).astype(np.uint16)
-##        depth_img = cv2.flip(depth_img, 1)
-##        print(depth_img[50][50])
-        
-        #cv2.imshow('Test Depth View', depth_img)
-        # print(color_point_2_depth_point(kinect, _DepthSpacePoint, kinect._depth_frame_data, [100, 100]))
-        # print(depth_points_2_world_points(kinect, _DepthSpacePoint, [[100, 150], [200, 250]]))
-        # print(intrinsics(kinect).FocalLengthX, intrinsics(kinect).FocalLengthY, intrinsics(kinect).PrincipalPointX, intrinsics(kinect).PrincipalPointY)
-        # print(intrinsics(kinect).RadialDistortionFourthOrder, intrinsics(kinect).RadialDistortionSecondOrder, intrinsics(kinect).RadialDistortionSixthOrder)
-        # print(world_point_2_depth(kinect, _CameraSpacePoint, [0.250, 0.325, 1]))
-        # img = depth_2_color_space(kinect, _DepthSpacePoint, kinect._depth_frame_data, show=False, return_aligned_image=True)
-        # depth_2_color_space(kinect, _DepthSpacePoint, kinect._depth_frame_data, show=True)
-        # img = color_2_depth_space(kinect, _ColorSpacePoint, kinect._depth_frame_data, show=True, return_aligned_image=True)
+        cv2.putText(colorImage, "FPS: " + str(round(fps, 2)), (10, 50), font, 2, (0, 0, 0), 3)
+        cv2.imshow("Image", colorImage)    
+
+
+
 
     # Quit using q
     if cv2.waitKey(1) & 0xff == ord('q'):
         break
-#cap.release()
+
 cv2.destroyAllWindows()
