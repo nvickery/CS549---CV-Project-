@@ -15,7 +15,10 @@ import cv2
 import numpy as np
 import time
 import os
+import sys
 
+# NEEDS TO BE IN PYTHON 3.7.9 
+assert(sys.version[:5] == "3.7.9")
 # Intiate YOLO Model ---------------------------------------------------------
 
 # Change to Path location of weights and cfg files
