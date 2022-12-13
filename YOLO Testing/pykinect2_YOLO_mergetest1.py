@@ -16,6 +16,9 @@ import numpy as np
 import time
 import os
 import sys
+from mapper import color_2_world
+import math
+import matplotlib.pyplot as plt
 
 # NEEDS TO BE IN PYTHON 3.7.9 
 assert(sys.version[:5] == "3.7.9")
@@ -27,8 +30,16 @@ if os.getcwd() is not path:
     os.chdir(path)
     
 # Load Yolo
-net = cv2.dnn.readNet("weights/yolov3.weights", "cfg/yolov3.cfg")
-# net = cv2.dnn.readNet("weights/yolov3-tiny.weights", "cfg/yolov3-tiny.cfg")
+tiny = False
+if tiny:
+# net = cv2.dnn.readNet("weights/yolov3.weights", "cfg/yolov3.cfg")
+    net = cv2.dnn.readNet("weights/yolov3-tiny.weights", "cfg/yolov3-tiny.cfg")
+    current_model_size = "tiny"
+else:
+    net = cv2.dnn.readNet("weights/yolov3.weights", "cfg/yolov3.cfg")
+    current_model_size = "Large"
+
+
 classes = []
 with open("coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
@@ -45,7 +56,18 @@ prevBoxes = []
 
 
 ## Initiate Kinect -----------------------------------------------------------
-kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Color) #PyKinectV2.FrameSourceTypes_Depth | 
+kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Color | PyKinectV2.FrameSourceTypes_Depth)
+
+true_center_x, true_center_y = 0,0
+previous_xy = [0,0,0]
+x_velocity, y_velocity, z_velocity = 0,0,0
+avg_x_velocity, avg_y_velocity, avg_z_velocity = 0,0,0
+x_velocities, y_velocities, z_velocities = [],[],[]
+xv_plot_values, yv_plot_values, zv_plot_values = [],[],[]
+x_plot_values, y_plot_values, z_plot_values = [],[],[]
+fps_values, timestamps = [], []
+object_of_interest = "person"
+n = 5  # how many frames to average velocities at
 
 
 # Main loop ------------------------------------------------------------------
@@ -60,12 +82,12 @@ while True:
         # pre process image 
         colorImage = color_frame.reshape((height,width, 4)).astype(np.uint8)
         trimmed_image = colorImage[:,:,0:3] # removes 255 values that are leftover from the reshaping from 4th column 
-        colorImage = cv2.flip(colorImage, 1)
+        # colorImage = cv2.flip(colorImage, 1)
 
         # cv2.imshow('Test Color View', cv2.resize(trimmed_image, (int(1920 / 2.5), int(1080 / 2.5))))
         
-        
-        
+        test_img = color_2_world(kinect, kinect._depth_frame_data, _CameraSpacePoint, as_array=True)
+        # print(test_img.shape)
         frame_id += 1
 
         # height, width, channels = color_frame.shape
@@ -80,12 +102,13 @@ while True:
         class_ids = []
         confidences = []
         boxes = []
+        # centers = []
         for out in outs:
             for detection in out:
                 scores = detection[5:]
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
-                if confidence > 0.2:
+                if confidence > 0.5:
                     # Object detected
                     center_x = int(detection[0] * width)
                     center_y = int(detection[1] * height)
@@ -97,31 +120,145 @@ while True:
                     y = int(center_y - h / 1.8)
 
                     boxes.append([x, y, w, h])
+                    # centers.append([center_x, center_y])
                     confidences.append(float(confidence))
                     class_ids.append(class_id)
                     #print(str(classes[class_id]))
 
         indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.4, 0.3)
+       
 
+    
+        
         for i in range(len(boxes)):
             if i in indexes:
                 x, y, w, h = boxes[i]
                 label = str(classes[class_ids[i]])
-                confidence = confidences[i]
                 color = colors[class_ids[i]]
-                cv2.rectangle(colorImage, (x, y), (x + w, y + h), color, 2)
-                cv2.putText(colorImage, label + " " + str(round(confidence, 2)), (x, y + 30), font, 2, color, 2)
+                if label == object_of_interest:
+                    confidence = confidences[i]
+                    true_center_x = x + int(w/2) #center_x 
+                    true_center_y =  y + int(h/2) #center_y
+                    
+                    cv2.rectangle(colorImage, (x, y), (x + w, y + h), color, 2)
+                    cv2.putText(colorImage, label + " " + str(round(confidence, 2)), (x, y + 30), font, 2, color, 2)
+                    # cv2.putText(colorImage, 'Center' + " " + str(x + int(w/2)) + ',' + str(y + int(h/2)), (x + int(w/2), y + int(h/2)), font, 2, color, 2)
+
+                    cv2.putText(colorImage, 'Center' + " " + str(true_center_x) + ',' + str(true_center_y), (true_center_x, true_center_y), font, 2, color, 3)
+          # in world frame
+        
+        
+        # if (true_center_x is not None) and (true_center_y is not None):
+        #     print(f"Center: {true_center_x} , {true_center_y}")
+        #     print(test_img[true_center_y][true_center_x])
 
         elapsed_time = time.time() - starting_time
         fps = frame_id / elapsed_time
-        cv2.putText(colorImage, "FPS: " + str(round(fps, 2)), (10, 50), font, 2, (0, 0, 0), 3)
-        cv2.imshow("Image", colorImage)    
 
+
+
+        current_xy = test_img[true_center_y][true_center_x] 
+
+        if math.isinf(current_xy[0]):  # checks if a value of 'inf' is given by the Kinect
+            continue
+
+        x_velocity = np.sqrt(((current_xy[0]-previous_xy[0])**2))/elapsed_time
+        y_velocity = np.sqrt(((current_xy[1]-previous_xy[1])**2))/elapsed_time
+        z_velocity = np.sqrt(((current_xy[2]-previous_xy[2])**2))/elapsed_time
+
+
+        fps_values.append(fps)
+        timestamps.append(elapsed_time)
+        # Velocity values for calculation (x_velocities list is cleared after n frames)
+        x_velocities.append(x_velocity)
+        y_velocities.append(y_velocity)
+        z_velocities.append(z_velocity)
+
+        # Velocity Values for Plotting
+        xv_plot_values.append(x_velocity)
+        yv_plot_values.append(y_velocity)
+        zv_plot_values.append(z_velocity)
+
+        # Position Values for Plotting
+        x_plot_values.append(current_xy[0])
+        y_plot_values.append(current_xy[1])
+        z_plot_values.append(current_xy[2])
+
+
+
+        if frame_id % n == 0:
+            avg_x_velocity = sum(x_velocities)/len(x_velocities)
+            avg_y_velocity = sum(y_velocities)/len(y_velocities)
+            avg_z_velocity = sum(z_velocities)/len(z_velocities)
+        
+        print(f"Average X Velocity: {avg_x_velocity} \n",
+             f"Average Y Velocity: {avg_y_velocity} \n",
+             f"Average Z Velocity: {avg_z_velocity} \n")
+
+        # if frame_id % 2 ==  0:
+        #     current_xy = test_img[true_center_y][true_center_x] 
+        #     x_velocity = np.sqrt(((current_xy[0]-previous_xy[0])**2))/elapsed_time
+        #     y_velocity = np.sqrt(((current_xy[1]-previous_xy[1])**2))/elapsed_time
+        #     z_velocity = np.sqrt(((current_xy[2]-previous_xy[2])**2))/elapsed_time
+
+        # velocity = np.sqrt(((current_xy[0]-previous_xy[0])**2) + ((current_xy[1]-previous_xy[1])**2) + ((current_xy[2]-previous_xy[2])**2))/elapsed_time
+
+        # center_x, center_y = centers[i]
+        # cv2.putText(colorImage, "Center", (center_x, center_y), font, 2, color, 2)
+        # cv2.putText(colorImage, 'Center' + " " + str(x + int(w/2)) + ',' + str(y + int(h/2)), (x + int(w/2), y + int(h/2)), font, 2, color, 2)
+
+        cv2.putText(colorImage, "FPS: " + str(round(fps, 2)), (10, 50), font, 2, (0, 0, 0), 3)
+
+        cv2.putText(colorImage, "Using Model Size: " + current_model_size, (10, 120), font, 2, (0, 0, 0), 4)
+        cv2.putText(colorImage, "Looking for: " + object_of_interest, (10, 160), font, 2, (0, 0, 0), 4)
+
+
+        cv2.putText(colorImage, "X Position: " + str(round(current_xy[0],2)) + " m", (1400, 40), font, 2, (0, 0, 0), 4)
+        cv2.putText(colorImage, "Y Position: " + str(round(current_xy[1],2)) + " m", (1400, 80), font, 2, (0, 0, 0), 4)
+        cv2.putText(colorImage, "Z Position: " + str(round(current_xy[2],2)) + " m", (1400, 120), font, 2, (0, 0, 0), 4)
+
+        cv2.putText(colorImage, "X Velocity: " + str(round(avg_x_velocity,4)) + " m/s", (850, 40), font, 2, (0, 0, 0), 4)
+        cv2.putText(colorImage, "Y Velocity: " + str(round(avg_y_velocity,4)) + " m/s", (850, 80), font, 2, (0, 0, 0), 4)
+        cv2.putText(colorImage, "Z Velocity: " + str(round(avg_z_velocity,4)) + " m/s", (850, 120), font, 2, (0, 0, 0), 4)
+
+
+
+        # cv2.putText(colorImage, "X Velocity: " + str(round(x_velocity,4)) + " m/s", (1000, 40), font, 2, (0, 0, 0), 3)
+        # cv2.putText(colorImage, "Y Velocity: " + str(round(y_velocity,4)) + " m/s", (1000, 80), font, 2, (0, 0, 0), 3)
+        # cv2.putText(colorImage, "Z Velocity: " + str(round(z_velocity,4)) + " m/s", (1000, 120), font, 2, (0, 0, 0), 3)
+        
+
+        cv2.imshow("Image", cv2.resize(colorImage, (int(1920/2.5), int(1080/2.5))))
+
+        previous_xy = test_img[true_center_y][true_center_x]    # in world frame
+
+
+        if frame_id % n == 0:
+                x_velocities, y_velocities, z_velocities = [],[],[]
 
 
 
     # Quit using q
     if cv2.waitKey(1) & 0xff == ord('q'):
         break
+
+# with open(r"C:\Users\layhu\OneDrive\Desktop\CS549---CV-Project-\YOLO Testing\plot_data.txt", "w") as file:
+#     for item in timestamps:
+#         file.write(str(xv_plot_values))
+#         print("Finished Printing Values")
+        
+plt.subplot(2,3,1), plt.plot(timestamps[5:], xv_plot_values[5:]), plt.title("X Velocity (m/s)"), plt.xlabel("Time (s)"), plt.ylabel("Velocity (m/s)")
+plt.subplot(2,3,2), plt.plot(timestamps[5:], yv_plot_values[5:]), plt.title("Y Velocity (m/s)"), plt.xlabel("Time (s)"), plt.ylabel("Velocity (m/s)")
+plt.subplot(2,3,3), plt.plot(timestamps[5:], zv_plot_values[5:]), plt.title("Z Velocity (m/s)"), plt.xlabel("Time (s)"), plt.ylabel("Velocity (m/s)")
+plt.subplot(2,3,4), plt.plot(timestamps[5:], x_plot_values[5:]), plt.title("X Position (m)"), plt.xlabel("Time (s)"), plt.ylabel("Position (m)")
+plt.subplot(2,3,5), plt.plot(timestamps[5:], y_plot_values[5:]), plt.title("Y Position (m)"), plt.xlabel("Time (s)"), plt.ylabel("Position (m)")
+plt.subplot(2,3,6), plt.plot(timestamps[5:], z_plot_values[5:]), plt.title("Z Position (m)"), plt.xlabel("Time (s)"), plt.ylabel("Position (m)")
+plt.show()
+
+
+# print(f"X Velocities:  {xv_plot_values} \n\n\n")
+# print(f"Timestamps:  {timestamps}")
+
+
 
 cv2.destroyAllWindows()
