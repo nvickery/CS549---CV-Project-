@@ -64,12 +64,13 @@ while True:
     confidences = []
     boxes = []
     norfair_detections = []
+
     for out in outs:
         for detection in out:
             scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
-            if confidence > 0.4:
+            if confidence > 0.2:
                 # Object detected
                 x, y, w, h = get_centroid(detection, height, width)
                 boxes.append([x, y, w, h])
@@ -77,17 +78,35 @@ while True:
                 class_ids.append(class_id)
                 name = (str(classes[class_id]))
                 #points = np.array([x,y])
-                points = np.array([[x,y],[x+w, y+h]])
-                norfair_detections.append(
-                    Detection(
-                    # Points detected. Must be a rank 2 array with shape (n_points, n_dimensions) where n_dimensions is 2 or 3.
-                        points = points,
-                        #scores = confidence,
-                        label = name
-                    )
-                )
+                #ndexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.4, 0.7)
 
+                points = np.array([[x,y],[x+w, y+h]])
+                #norfair_detections.append(
+                #    Detection(
+                    # Points detected. Must be a rank 2 array with shape (n_points, n_dimensions) where n_dimensions is 2 or 3.
+                #        points = points,
+                        #scores = confidence,
+                 #       label = name
+                #    )
+               # )
+        #indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.4, 0.7)
+
+    # Non max supression 0.4 0.3
     indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.4, 0.3)
+
+    for i in range(len(boxes)):
+        if i in indexes:
+            x, y, w, h = boxes[i]
+            points = np.array([[x,y],[x+w, y+h]])
+            norfair_detections.append(
+                Detection(
+                # Points detected. Must be a rank 2 array with shape (n_points, n_dimensions) where n_dimensions is 2 or 3.
+                    points = points,
+                    #scores = confidence,
+                    label = name
+                )
+            )
+
 
     tracked_objects = tracker.update(detections=norfair_detections)
 
@@ -95,6 +114,7 @@ while True:
     #norfair.draw_points(frame, norfair_detections)
     norfair.draw_boxes(frame, norfair_detections)
     norfair.draw_tracked_objects(frame, tracked_objects)
+
 
     # for i in range(len(boxes)):
     #     if i in indexes:
