@@ -30,7 +30,7 @@ if os.getcwd() is not path:
     os.chdir(path)
     
 # Load Yolo
-tiny = False
+tiny = True
 if tiny:
 # net = cv2.dnn.readNet("weights/yolov3.weights", "cfg/yolov3.cfg")
     net = cv2.dnn.readNet("weights/yolov3-tiny.weights", "cfg/yolov3-tiny.cfg")
@@ -253,6 +253,9 @@ plt.subplot(2,3,3), plt.plot(timestamps[5:], zv_plot_values[5:]), plt.title("Z V
 plt.subplot(2,3,4), plt.plot(timestamps[5:], x_plot_values[5:]), plt.title("X Position (m)"), plt.xlabel("Time (s)"), plt.ylabel("Position (m)")
 plt.subplot(2,3,5), plt.plot(timestamps[5:], y_plot_values[5:]), plt.title("Y Position (m)"), plt.xlabel("Time (s)"), plt.ylabel("Position (m)")
 plt.subplot(2,3,6), plt.plot(timestamps[5:], z_plot_values[5:]), plt.title("Z Position (m)"), plt.xlabel("Time (s)"), plt.ylabel("Position (m)")
+plt.suptitle("Y Velocity Testing - Soccer Ball")
+
+# plt.plot(timestamps[5:], fps_values[5:]), plt.title("FPS: YOLOv3-tiny"), plt.ylabel("Frames"), plt.xlabel("Time (s)")
 plt.show()
 
 
