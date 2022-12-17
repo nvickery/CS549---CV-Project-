@@ -1,11 +1,15 @@
 """
+This code for Velocity Computation was written by I. Feeney, C. Layhue, N. Vickery. 
+Our testing and additional code can be found in our github. 
+The original base Kinect usage .py file was written by K. Angelopoulos as described in the following.
+"""
+
+"""
 Author: Konstantinos Angelopoulos
 Date: 04/02/2020
 All rights reserved.
 Feel free to use and modify and if you like it give it a star.
 """
-
-# *modified for testing by N. Vickery on 11/7/22
 
 ## Import Modules -------------------------------------------------------------
 from pykinect2 import PyKinectV2
