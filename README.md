@@ -21,7 +21,7 @@ https://user-images.githubusercontent.com/47203558/208214947-b4b63f11-071a-4b29-
 <ul>
 <li>Python 3.7.9</li>
 <li>OpenCV 4.2.0</li>
-<li><a href="hhttps://github.com/muhammadshiraz/YOLO-Real-Time-Object-Detection">YOLOv3</a> </li>
+<li><a href="https://github.com/muhammadshiraz/YOLO-Real-Time-Object-Detection">YOLOv3</a> </li>
 <li><a href="https://github.com/Kinect/PyKinect2">PyKinect2</a> </li>
 </ul>
 
