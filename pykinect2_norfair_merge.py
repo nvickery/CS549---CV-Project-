@@ -24,19 +24,28 @@ from mapper import color_2_world
 import math
 import matplotlib.pyplot as plt
 import norfair
-from norfair import Detection, Paths, Tracker, Video
+from norfair import Detection, Tracker
 
 # NEEDS TO BE IN PYTHON 3.7.9 
 assert(sys.version[:5] == "3.7.9")
-# Intiate YOLO Model ---------------------------------------------------------
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ USER INPUTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Change to Path location of weights and cfg files --------------------------
 path = r"C:\Users\layhu\OneDrive\Grad School\CS 549  (Computer Vision)\CS549---CV-Project-\YOLO Testing"
+
+tiny = False # True if you want to use yolov3-tiny, False if large
+object_of_interest = "sports ball" # use a namem from the coco.names file
+n = 5  # how many frames to average velocities at for numbers placed on live feed
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ USER INPUTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 if os.getcwd() is not path:
     os.chdir(path)
-    
 # Load Yolo---------------------------------------------------------------
-tiny = False
 if tiny:
 # net = cv2.dnn.readNet("weights/yolov3.weights", "cfg/yolov3.cfg")
     net = cv2.dnn.readNet("weights/yolov3-tiny.weights", "cfg/yolov3-tiny.cfg")
@@ -74,8 +83,7 @@ x_velocities, y_velocities, z_velocities = [],[],[]
 xv_plot_values, yv_plot_values, zv_plot_values = [],[],[]
 x_plot_values, y_plot_values, z_plot_values = [],[],[]
 fps_values, timestamps = [], []
-object_of_interest = "sports ball"
-n = 5  # how many frames to average velocities at
+
 
 
 # Main loop ------------------------------------------------------------------
