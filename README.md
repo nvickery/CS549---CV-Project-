@@ -10,7 +10,7 @@ In order
 		<th><strong>Z Velocity Testing with Soccer Ball and YOLOv3</strong></th>
 	</tr>
 	<tr align="center">
-		<td><img src="https://github.com/muhammadshiraz/YOLO-Real-Time-Object-Detection/blob/master/doc/detector1.gif"></td>		
+		<td><img src="https://github.com/nvickery/CS549---CV-Project-/Z_velocity_test_soccer_ball.mp4"></td>		
 	</tr>
 </tbody>
 </table>
