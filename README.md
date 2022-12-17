@@ -13,10 +13,12 @@ In order
 	<tr align="center">
 		<th><strong>Z Velocity Testing with Soccer Ball and YOLOv3</strong></th>
 	</tr>
-	<tr align="center">
-		https://user-images.githubusercontent.com/47203558/208214840-8e709bb3-6b5a-40f9-921b-8daf4b4b19b0.mp4	
-	</tr>
 </tbody>
+	
+
+https://user-images.githubusercontent.com/47203558/208214947-b4b63f11-071a-4b29-ae34-45f86b2cca28.mp4
+
+
 </table>
 
 ## Requirements
