@@ -1,30 +1,16 @@
-## YOLO Real Time Object Detection
+## Velocity Calculation with Kinectv2 Camera
 
-This project implements a real time object detection via video, webcam and image detection using YOLO algorithm. YOLO is a object detection algorithm which stand for You Only Look Once. I've implemented the algorithm from scratch in Python using pre-trained weights. YOLOv3 was published in research paper: <a href="https://pjreddie.com/media/files/papers/YOLOv3.pdf" rel="nofollow">YOLOv3: An Incremental Improvement: Joseph Redmon, Ali Farhadi</a> It's originally implemented in <a href="https://github.com/pjreddie/darknet">YOLOv3</a>.
+This repository is the location of Group IV's final project for CS 549, Fall 2022. The following project aims to estimate the velocity of a detected object using YOLOv3, norfair, and the Kinect SDK. YOLOv3 was published in research paper: <a href="https://pjreddie.com/media/files/papers/YOLOv3.pdf" rel="nofollow">YOLOv3: An Incremental Improvement: Joseph Redmon, Ali Farhadi</a> It's originally implemented in <a href="https://github.com/pjreddie/darknet">YOLOv3</a>.
 
-COCO dataset is used for training.
-
-Real time detection can be use via command prompt or GUI.
+COCO dataset was used for training.
 
 <table>
   <tbody>
 	<tr align="center">
-		<th><strong>A USA Real-Time Road Detection</strong></th>
+		<th><strong>Z Velocity Testing with Soccer Ball and YOLOv3</strong></th>
 	</tr>
 	<tr align="center">
 		<td><img src="https://github.com/muhammadshiraz/YOLO-Real-Time-Object-Detection/blob/master/doc/detector1.gif"></td>		
-	</tr>
-	<tr align="center">
-		<th><strong>A UK Real-Time Road Detection</strong></th>
-	</tr>
-	<tr align="center">
-		<td><img src="https://github.com/muhammadshiraz/YOLO-Real-Time-Object-Detection/blob/master/doc/detector2.gif"></td>
-	</tr>
-	<tr align="center">
-		<th><strong>A Real-Time Webcam Detection</strong></th>
-	</tr>
-	<tr align="center">
-		<td style="width: 100%;"><img src="https://github.com/muhammadshiraz/YOLO-Real-Time-Object-Detection/blob/master/doc/webcam_detector.jpg"></td>
 	</tr>
 </tbody>
 </table>
@@ -34,19 +20,8 @@ With yolo we can detect real time objects at a relatively high speed. With a GPU
 
 OpenCV dnn module supports running inference on pre-trained deep learning models from popular frameworks like Caffe, Torch and TensorFlow.
 
-## Requirement
-<ul>
-<li>OpenCV 4.2.0</li>
-<li>Python 3.6</li>
-</ul>
 
-## Quick start
-<ul>
-  <li>Download official <a href="https://pjreddie.com/media/files/yolov3.weights" rel="nofollow">yolov3.weights</a> and place it under a folder called weight.</li>
-  <li>Download official <a href="https://pjreddie.com/media/files/yolov3-tiny.weights" rel="nofollow">yolov3-tiny.weights</a> and place it under a folder called weight.</li>
-  <li>Download <a href="https://github.com/pjreddie/darknet/blob/master/cfg/yolov3.cfg">yolov3.cfg</a> and place it under a folder called cfg.</li>
-  <li>Download <a href="https://github.com/pjreddie/darknet/blob/master/cfg/yolov3-tiny.cfg">yolov3-tiny.cfg</a> and place it under a folder called cfg.</li>
-</ul>
+
 
 ## Dependencies
 <ul>
