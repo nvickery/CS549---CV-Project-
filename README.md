@@ -4,13 +4,17 @@ This repository is the location of Group IV's final project for CS 549, Fall 202
 
 In order 
 
+
+
+
+
 <table>
   <tbody>
 	<tr align="center">
 		<th><strong>Z Velocity Testing with Soccer Ball and YOLOv3</strong></th>
 	</tr>
 	<tr align="center">
-		<td><img src="https://github.com/nvickery/CS549---CV-Project-/Z_velocity_test_soccer_ball.mp4"></td>		
+		https://user-images.githubusercontent.com/47203558/208214840-8e709bb3-6b5a-40f9-921b-8daf4b4b19b0.mp4	
 	</tr>
 </tbody>
 </table>
