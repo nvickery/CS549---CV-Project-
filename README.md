@@ -6,12 +6,12 @@ This repository is the location of Group IV's final project for CS 549, Fall 202
 ## BEFORE RUNNING!!!!!!!!
 
 Please edit the following variables in the User Inputs section at the top of the `pykinect2_norfair_merge.py` file:
-<ul>
-<li>`path` - Location of the cfg and weights folders that contain the `.cfg` and `.weights` files for YOLOv3-tiny and YOLOv3.</li>
-<li>`tiny` - bool: `True` if YOLOv3-tiny is to be used for the object detection; `False` if YOLOv3 is to be used.</li>
-<li>`object_of_interest` - Change this based on the object that's velocity you would like to track. NOTE: name must be in coco.names.</li>
-<li>`n` - number of frames to average the velocity over. This average velocity value is what is displayed in the live stream.</li> 
-</ul>
+
+ - `path` - Location of the cfg and weights folders that contain the `.cfg` and `.weights` files for YOLOv3-tiny and YOLOv3.
+ - `tiny` - bool: `True` if YOLOv3-tiny is to be used for the object detection; `False` if YOLOv3 is to be used.
+ - `object_of_interest` - Change this based on the object that's velocity you would like to track. NOTE: name must be in coco.names.
+ - `n` - number of frames to average the velocity over. This average velocity value is what is displayed in the live stream.
+
 
 Once all user inputs have been configured, run:
 
