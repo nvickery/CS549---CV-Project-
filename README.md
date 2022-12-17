@@ -8,13 +8,7 @@ In order to test out the program, run:
 pykinect2_norfair_mergy.py
 ```
 
-<table>
-  <tbody>
-	<tr align="center">
-		<th><strong>Z Velocity Testing with Soccer Ball and YOLOv3</strong></th>
-	</tr>
-</tbody>
-</table>	
+## Z Velocity Testing with Soccer Ball and YOLOv3
 
 https://user-images.githubusercontent.com/47203558/208214947-b4b63f11-071a-4b29-ae34-45f86b2cca28.mp4
 
