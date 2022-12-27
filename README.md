@@ -3,7 +3,7 @@
 This repository is the location of Group IV's final project for CS 549, Fall 2022. The following project aims to estimate the velocity of a detected object using YOLOv3, norfair, and PyKinect2. YOLOv3 was published in research paper: <a href="https://pjreddie.com/media/files/papers/YOLOv3.pdf" rel="nofollow">YOLOv3: An Incremental Improvement: Joseph Redmon, Ali Farhadi</a> It's originally implemented in <a href="https://github.com/pjreddie/darknet">YOLOv3</a>.
 
 
-## BEFORE RUNNING!!!!!!!!
+## BEFORE RUNNING!
 
 Please edit the following variables in the User Inputs section at the top of the `pykinect2_norfair_merge.py` file:
 
